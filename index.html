@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Календар — не профукай рік</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #e8ff47;
+    --text: #f0f0f0;
+    --muted: #666;
+    --radius: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 80px 24px 60px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--muted);
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 14vw, 80px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .hero h1 span {
+    color: var(--accent);
+  }
+
+  .hero p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 340px;
+  }
+
+  /* FORM */
+  .form-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    margin-top: 40px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .field select, .field input[type="range"] {
+    width: 100%;
+  }
+
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 13px 16px;
+    border-radius: var(--radius);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  /* PREVIEW */
+  .preview-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-inner {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #333;
+    transition: all 0.3s;
+  }
+
+  .dot.past { background: #444; }
+  .dot.today { background: var(--accent); transform: scale(1.3); }
+  .dot.future { background: #222; border: 1px solid #333; }
+
+  /* OPACITY SLIDER */
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    flex: 1;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(232,255,71,0.15);
+  }
+
+  .slider-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* OUTPUT */
+  .output-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    word-break: break-all;
+    line-height: 1.6;
+    min-height: 60px;
+    transition: border-color 0.3s;
+  }
+
+  .output-box.has-url {
+    color: var(--accent);
+    border-color: rgba(232,255,71,0.3);
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0a;
+    flex: 1;
+  }
+
+  .btn-primary:hover { background: #d4eb30; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* INSTRUCTIONS */
+  .instructions {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .instructions h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(232,255,71,0.08);
+    border: 1px solid rgba(232,255,71,0.2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    min-width: 32px;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .step-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .step-text strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: #0a0a0a;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 100px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 999;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  * { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Обої для iPhone · Щоденне оновлення</div>
+  <h1>Не<br>профукай<br><span>рік.</span></h1>
+  <p>Обої-календар, які оновлюються автоматично і показують прогрес року.</p>
+</div>
+
+<div class="form-wrap">
+
+  <div class="section-label">1 · Налаштування</div>
+
+  <div class="field">
+    <label>Модель iPhone</label>
+    <select id="model">
+      <option value="iphone_16_pro">iPhone 16 Pro / Pro Max</option>
+      <option value="iphone_16">iPhone 16 / Plus</option>
+      <option value="iphone_15_pro" selected>iPhone 15 Pro / Pro Max</option>
+      <option value="iphone_15">iPhone 15 / Plus</option>
+      <option value="iphone_14_pro">iPhone 14 Pro / Pro Max</option>
+      <option value="iphone_14">iPhone 14 / Plus</option>
+      <option value="iphone_13_pro">iPhone 13 Pro / Pro Max</option>
+      <option value="iphone_13">iPhone 13 / mini</option>
+      <option value="iphone_se">iPhone SE (3rd gen)</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Стиль календаря</label>
+    <select id="style">
+      <option value="dots">Dots — кружечки</option>
+      <option value="dots_mini">Dots Mini — дрібні кружечки</option>
+      <option value="numbers">Numbers — числа</option>
+      <option value="numbers_bold">Numbers Bold — жирні числа</option>
+      <option value="squares">Squares — квадрати</option>
+      <option value="squares_rounded">Squares Rounded — заокруглені квадрати</option>
+      <option value="lines">Lines — лінії</option>
+      <option value="bars">Bars — смуги</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Розмір календаря</label>
+    <select id="calendar_size">
+      <option value="small">Малий</option>
+      <option value="standard" selected>Стандартний</option>
+      <option value="large">Великий</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Вихідні дні</label>
+    <select id="weekend_mode">
+      <option value="none">Без виділення</option>
+      <option value="weekends_only" selected>Тільки вихідні</option>
+      <option value="all">Всі дні тижня</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Тема</label>
+    <select id="theme">
+      <option value="graphite_orange" selected>Graphite Orange</option>
+      <option value="graphite_yellow">Graphite Yellow</option>
+      <option value="graphite_green">Graphite Green</option>
+      <option value="graphite_blue">Graphite Blue</option>
+      <option value="graphite_red">Graphite Red</option>
+      <option value="graphite_pink">Graphite Pink</option>
+      <option value="white_orange">White Orange</option>
+      <option value="white_yellow">White Yellow</option>
+      <option value="white_blue">White Blue</option>
+      <option value="white_green">White Green</option>
+      <option value="black_white">Black & White</option>
+      <option value="pure_white">Pure White</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Мова</label>
+    <select id="lang">
+      <option value="uk" selected>Українська</option>
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="pl">Polski</option>
+      <option value="de">Deutsch</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Часовий пояс</label>
+    <select id="timezone">
+      <option value="2">UTC+2 (Київ)</option>
+      <option value="3">UTC+3 (Москва)</option>
+      <option value="0">UTC+0 (Лондон)</option>
+      <option value="1">UTC+1 (Берлін, Варшава)</option>
+      <option value="-5">UTC-5 (Нью-Йорк)</option>
+      <option value="-8">UTC-8 (Лос-Анджелес)</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Підпис внизу</label>
+    <select id="footer">
+      <option value="days_left_percent_left">Залишилось днів + % залишилось</option>
+      <option value="days_left">Залишилось днів</option>
+      <option value="days_passed">Пройдено днів</option>
+      <option value="percent_left">% залишилось</option>
+      <option value="percent_passed">% пройдено</option>
+      <option value="none">Без підпису</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Прозорість фону</label>
+    <div class="slider-wrap">
+      <input type="range" id="opacity" min="0" max="100" step="10" value="0">
+      <span class="slider-value" id="opacity-val">0%</span>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;font-family:'DM Mono',monospace">Прозорість потрібна якщо хочеш своє фото на фоні</p>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="section-label">Приклад стилю</div>
+  <div class="preview-box">
+    <div class="preview-inner" id="preview"></div>
+  </div>
+
+  <!-- URL OUTPUT -->
+  <div class="section-label">Згенерована ссилка</div>
+  <div class="output-box" id="url-output">Налаштуй параметри — ссилка з'явиться тут автоматично</div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="copyUrl()">Скопіювати ссилку</button>
+    <button class="btn btn-secondary" onclick="openPng()">Відкрити PNG</button>
+  </div>
+
+  <!-- INSTRUCTIONS -->
+  <div class="instructions">
+    <h2>Як налаштувати на iPhone</h2>
+
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-text"><strong>Скопіюй ссилку</strong> вище і збережи її.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-text">Відкрий <strong>«Команди»</strong> → вкладка <strong>«Автоматизація»</strong> → кнопка <strong>+</strong></div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-text">Обери тригер <strong>«Час доби»</strong> — наприклад, 00:01. Вимкни «Надсилати сповіщення».</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-text">Додай дію <strong>«Отримати вміст URL»</strong> → встав свою ссилку.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-text">Додай дію <strong>«Встановити шпалери»</strong> → вибери «Вміст URL» → Екран блокування.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">06</div>
+      <div class="step-text">Натисни <strong>▶ Готово</strong> — щодня о вказаний час iPhone сам оновить обої!</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">Ссилку скопійовано!</div>
+
+<script>
+  const BASE = 'https://твій-проект.vercel.app/api/wallpaper';
+
+  const inputs = ['model','style','calendar_size','weekend_mode','opacity','theme','lang','timezone','footer'];
+
+  function getUrl() {
+    const p = new URLSearchParams();
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      p.set(id, el.value);
+    });
+    return `${BASE}?${p.toString()}`;
+  }
+
+  function updateAll() {
+    const url = getUrl();
+    const out = document.getElementById('url-output');
+    out.textContent = url;
+    out.classList.add('has-url');
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const style = document.getElementById('style').value;
+    const theme = document.getElementById('theme').value;
+
+    const accentMap = {
+      graphite_orange: '#ff8c42', graphite_yellow: '#e8ff47', graphite_green: '#4fffb0',
+      graphite_blue: '#47b8ff', graphite_red: '#ff4747', graphite_pink: '#ff47c8',
+      white_orange: '#ff8c42', white_yellow: '#f0c000', white_blue: '#3b82f6',
+      white_green: '#22c55e', black_white: '#ffffff', pure_white: '#888'
+    };
+
+    const accent = accentMap[theme] || '#e8ff47';
+    const container = document.getElementById('preview');
+    container.innerHTML = '';
+
+    const total = 14;
+    const today = 8;
+
+    for (let i = 1; i <= total; i++) {
+      const el = document.createElement('div');
+
+      if (style.startsWith('dots') || style === 'dots_mini') {
+        el.className = 'dot ' + (i < today ? 'past' : i === today ? 'today' : 'future');
+        const size = style === 'dots_mini' ? '10px' : '14px';
+        el.style.width = size; el.style.height = size;
+        if (i < today) el.style.background = accent + '99';
+        if (i === today) el.style.background = accent;
+
+      } else if (style.startsWith('squares')) {
+        el.style.cssText = `width:14px;height:14px;border-radius:${style.includes('rounded')?'4px':'2px'};
+          background:${i < today ? accent+'99' : i === today ? accent : '#222'};
+          border:1px solid ${i >= today ? '#333' : 'transparent'};
+          transition:all 0.3s;display:inline-block`;
+
+      } else if (style === 'lines' || style === 'bars') {
+        el.style.cssText = `width:${style==='bars'?'16px':'3px'};height:${style==='bars'?'8px':'20px'};
+          border-radius:2px;background:${i < today ? accent+'99' : i === today ? accent : '#222'};
+          border:1px solid ${i >= today ? '#333' : 'transparent'};
+          display:inline-block;margin:1px`;
+
+      } else {
+        // numbers
+        el.style.cssText = `font-family:'DM Mono',monospace;font-size:${style.includes('bold')?'13px':'11px'};
+          font-weight:${style.includes('bold')?'600':'400'};
+          color:${i < today ? accent+'cc' : i === today ? accent : '#333'};
+          min-width:20px;text-align:center`;
+        el.textContent = i;
+      }
+
+      container.appendChild(el);
+    }
+  }
+
+  // Opacity slider
+  document.getElementById('opacity').addEventListener('input', function() {
+    document.getElementById('opacity-val').textContent = this.value + '%';
+    updateAll();
+  });
+
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', updateAll);
+  });
+
+  function copyUrl() {
+    const url = getUrl();
+    navigator.clipboard.writeText(url).then(() => showToast('Ссилку скопійовано!'));
+  }
+
+  function openPng() {
+    window.open(getUrl(), '_blank');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  updateAll();
+</script>
+</body>
+</html>
