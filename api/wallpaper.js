@@ -1,7 +1,7 @@
 // api/wallpaper.js — Vercel Serverless Function
 // Generates calendar wallpaper PNG on the fly using @vercel/og (Satori + Resvg)
+import { ImageResponse } from 'next/og'; 
 
-import { ImageResponse } from '@vercel/og';
 
 export const config = { runtime: 'edge' };
 
