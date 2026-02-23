@@ -1,8 +1,12 @@
 {
   "name": "calendar-wallpaper",
   "version": "1.0.0",
-  "description": "Автоматичні обої-календар для iPhone",
+  "scripts": {
+    "start": "serve ."
+  },
   "dependencies": {
-    "@vercel/og": "^0.6.2"
+    "@vercel/og": "latest",
+    "lucide-react": "latest"
   }
 }
+
