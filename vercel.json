@@ -1,8 +1,10 @@
 {
+  "version": 2,
   "functions": {
-    "api/wallpaper.js": {
+    "api/*.js": {
       "runtime": "edge"
     }
   }
 }
+
 
